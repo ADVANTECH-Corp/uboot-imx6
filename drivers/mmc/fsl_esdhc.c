@@ -834,9 +834,13 @@ static int fsl_esdhc_init(struct fsl_esdhc_priv *priv)
 #endif
 
 	priv->cfg.f_min = 400000;
+#if defined(CONFIG_ADVANTECH) && defined(CONFIG_MMC_CLOCK_DOWNGRADE)
+	priv->cfg.f_max = min(priv->sdhc_clk, (u32)25000000);
+#else
 	priv->cfg.f_max = min(priv->sdhc_clk, (u32)52000000);
-
+#endif
 	priv->cfg.b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
+
 
 	mmc = mmc_create(&priv->cfg, priv);
 	if (mmc == NULL)
