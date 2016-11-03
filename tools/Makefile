@@ -57,7 +57,7 @@ mkenvimage-objs := mkenvimage.o os_support.o lib/crc32.o
 
 hostprogs-y += dumpimage mkimage
 hostprogs-$(CONFIG_FIT_SIGNATURE) += fit_info fit_check_sign
-
+hostprogs-y += mk_uboot_crc
 FIT_SIG_OBJS-$(CONFIG_FIT_SIGNATURE) := common/image-sig.o
 # Flattened device tree objects
 LIBFDT_OBJS := $(addprefix lib/libfdt/, \
@@ -127,6 +127,7 @@ tools/_libfdt.so: $(patsubst %.o,%.c,$(LIBFDT_OBJS)) tools/libfdt_wrap.c
 tools/libfdt_wrap.c: $(srctree)/lib/libfdt/libfdt.swig
 	swig -python -o $@ $<
 
+mk_uboot_crc-objs := mk_uboot_crc.o
 # TODO(sjg@chromium.org): Is this correct on Mac OS?
 
 ifneq ($(CONFIG_MX23)$(CONFIG_MX28),)
