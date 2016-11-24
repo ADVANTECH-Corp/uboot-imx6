@@ -110,7 +110,6 @@ int spl_board_ubi_load_image(u32 boot_device);
  */
 void __noreturn jump_to_image_linux(struct spl_image_info *spl_image,
 				    void *arg);
-
 /**
  * spl_start_uboot() - Check if SPL should start the kernel or U-Boot
  *
@@ -247,7 +246,10 @@ bool spl_was_boot_source(void);
  */
 int spl_dfu_cmd(int usbctrl, char *dfu_alt_info, char *interface, char *devstr);
 
+#ifdef CONFIG_ADVANTECH
+int spl_mmc_load_image(unsigned int dev);
+#else
 int spl_mmc_load_image(struct spl_image_info *spl_image,
 		       struct spl_boot_device *bootdev);
-
+#endif
 #endif
