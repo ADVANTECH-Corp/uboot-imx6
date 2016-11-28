@@ -122,6 +122,9 @@ obj-$(CONFIG_ENV_IS_IN_FLASH) += env_flash.o
 endif
 ifdef CONFIG_SPL_SATA_SUPPORT
 obj-$(CONFIG_SCSI) += scsi.o
+ifdef CONFIG_ADVANTECH
+obj-$(CONFIG_CMD_SATA) += sata.o
+endif
 endif
 endif
 #environment
