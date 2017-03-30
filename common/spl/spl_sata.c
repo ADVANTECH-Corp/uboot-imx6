@@ -20,6 +20,43 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#ifdef CONFIG_ADVANTECH
+static int spl_sata_check_crc(unsigned int dev)
+{
+        u32 n;
+        /* read crc file */
+        char tag[512];
+        char crc[512];
+
+        n = sata_read(dev, 0x02, 1, (void *) 0x22100000);
+        if(n != 1)
+                return 1;
+
+        memcpy(tag, (void *) 0x22100000, 512);
+        //tag[9] = '\0';
+        //printf("crc file %s\n", tag);
+
+        /* make uboot crc */
+        n = sata_read(dev, 0x03, 0x4b0, (void *) 0x22000000);
+        if(n != 0x4b0)
+                return 1;
+
+        *(int *)0x21f00000 = crc32 (0, (const uchar *) 0x22000000, 0x96000);
+        sprintf(crc, "%08x", *(int *)0x21f00000);
+        //crc[9] = '\0';
+        //printf("uboot crc %s\n", crc);
+
+        /* verrify crc */
+        if(memcmp(tag, crc, 8))
+        {
+                printf("spl: sata dev %d - crc error\n", dev);
+                return 1;
+        }
+
+        return 0;
+}
+#endif
+
 static int spl_sata_load_image(struct spl_image_info *spl_image,
 			       struct spl_boot_device *bootdev)
 {
@@ -39,6 +76,11 @@ static int spl_sata_load_image(struct spl_image_info *spl_image,
 		if (!stor_dev)
 			return -ENODEV;
 	}
+#ifdef CONFIG_ADVANTECH
+        err = spl_sata_check_crc(CONFIG_SPL_SATA_BOOT_DEVICE);
+        if (err) 
+                return err;
+#endif
 
 #ifdef CONFIG_SPL_OS_BOOT
 	if (spl_start_uboot() ||

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012-2016 Freescale Semiconductor, Inc.
+ * Copyright 2017 NXP
  *
  * Configuration settings for the Freescale i.MX6Q SabreSD board.
  *
@@ -10,17 +11,12 @@
 #define __MX6QSABRESD_CONFIG_H
 
 #ifdef CONFIG_SPL
-#define CONFIG_SATA_BOOT
-#define CONFIG_SPL_LIBCOMMON_SUPPORT
-#define CONFIG_SPL_LIBGENERIC_SUPPORT
-#define CONFIG_SPL_LIBDISK_SUPPORT
-#define CONFIG_SPL_MMC_SUPPORT
 #include "imx6_spl_advantech.h"
 #endif
-
+#define ADV_BOARD_NAME		"RSB4411"
 #define CONFIG_MACH_TYPE	3980
 #define CONFIG_MXC_UART_BASE	UART1_BASE
-#define CONFIG_CONSOLE_DEV		"ttymxc0"
+#define CONSOLE_DEV		"ttymxc0"
 #define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* SDHC3 */
 
 #if defined(CONFIG_TARGET_MX6RSB4411A1_512M) || defined(CONFIG_TARGET_MX6RSB4411A2_512M)
@@ -32,36 +28,34 @@
 #endif
 
 #if defined(CONFIG_TARGET_MX6RSB4411A1_1G)
-#if defined(CONFIG_MX6QP)
-#define CONFIG_DEFAULT_FDT_FILE	"imx6qp-rsb4411-a1.dtb"
-#elif defined(CONFIG_MX6Q)
-#define CONFIG_DEFAULT_FDT_FILE	"imx6q-rsb4411-a1.dtb"
-#elif defined(CONFIG_MX6DL)
-#define CONFIG_DEFAULT_FDT_FILE	"imx6dl-rsb4411-a1.dtb"
-#elif defined(CONFIG_MX6SOLO)
-#define CONFIG_DEFAULT_FDT_FILE	"imx6dl-rsb4411-a1.dtb"
-#endif
+#define ADV_DEFAULT_FDT_NAME	"rsb4411-a1"
 #elif defined(CONFIG_TARGET_MX6RSB4411A2_1G)
-#if defined(CONFIG_MX6QP)
-#define CONFIG_DEFAULT_FDT_FILE "imx6qp-rsb4411-a2.dtb"
-#elif defined(CONFIG_MX6Q)
-#define CONFIG_DEFAULT_FDT_FILE "imx6q-rsb4411-a2.dtb"
-#elif defined(CONFIG_MX6DL)
-#define CONFIG_DEFAULT_FDT_FILE "imx6dl-rsb4411-a2.dtb"
-#elif defined(CONFIG_MX6SOLO)
-#define CONFIG_DEFAULT_FDT_FILE "imx6dl-rsb4411-a2.dtb"
-#endif
+#define ADV_DEFAULT_FDT_NAME	"rsb4411-a2"
 #endif
 
 #include "mx6advantech_common.h"
+
+/* Falcon Mode */
+#define CONFIG_SPL_FS_LOAD_ARGS_NAME	"args"
+#define CONFIG_SPL_FS_LOAD_KERNEL_NAME	"uImage"
+#define CONFIG_CMD_SPL
+#define CONFIG_SYS_SPL_ARGS_ADDR       0x18000000
+#define CONFIG_CMD_SPL_WRITE_SIZE      (128 * SZ_1K)
+
+/* Falcon Mode - MMC support: args@1MB kernel@2MB */
+#define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR  0x800   /* 1MB */
+#define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS (CONFIG_CMD_SPL_WRITE_SIZE / 512)
+#define CONFIG_SYS_MMCSD_RAW_MODE_KERNEL_SECTOR        0x1000  /* 2MB */
 /* don't use pmic */
 #undef CONFIG_LDO_BYPASS_CHECK
 
 #define CONFIG_SYS_FSL_USDHC_NUM	3
 #define CONFIG_SYS_MMC_ENV_DEV		1	/* SDHC3 */
+#ifndef CONFIG_SYS_MMC_ENV_PART
 #define CONFIG_SYS_MMC_ENV_PART                0       /* user partition */
+#endif
 
-#ifdef CONFIG_SYS_USE_SPINOR
+#ifdef CONFIG_CMD_SF
 #define CONFIG_SF_DEFAULT_CS   0
 #endif
 
@@ -81,9 +75,8 @@
  * the kernel's, are required.
  */
 /* #define CONFIG_CMD_PCI */
-#ifdef CONFIG_CMD_PCI
-#define CONFIG_PCI
-#define CONFIG_PCI_PNP
+#ifdef CONFIG_PCI
+#define CONFIG_CMD_PCI
 #define CONFIG_PCI_SCAN_SHOW
 #define CONFIG_PCIE_IMX
 #define CONFIG_PCIE_IMX_PERST_GPIO	IMX_GPIO_NR(7, 12)
@@ -91,11 +84,9 @@
 #endif
 
 /* USB Configs */
-#define CONFIG_CMD_USB
 #ifdef CONFIG_CMD_USB
 #define CONFIG_USB_EHCI
 #define CONFIG_USB_EHCI_MX6
-#define CONFIG_USB_STORAGE
 #define CONFIG_EHCI_HCD_INIT_AFTER_RESET
 #define CONFIG_USB_HOST_ETHER
 #define CONFIG_USB_ETHER_ASIX
@@ -116,8 +107,6 @@
 	 * Framebuffer and LCD
 	 */
 	#define CONFIG_CMD_BMP
-	#define CONFIG_LCD
-	#define CONFIG_SYS_CONSOLE_IS_IN_ENV
 	#undef LCD_TEST_PATTERN
 	/* #define CONFIG_SPLASH_IS_IN_MMC			1 */
 	#define LCD_BPP					LCD_MONOCHROME
@@ -134,7 +123,7 @@
 #define IOMUX_LCD_VDD_EN	MX6_PAD_KEY_ROW0__GPIO4_IO07
 #define LCD_BKLT_PWM 		IMX_GPIO_NR(1, 1)
 #define LCD_BKLT_EN 		IMX_GPIO_NR(4, 6)
-#define LCD_VDD_EN 		IMX_GPIO_NR(4, 7)	
+#define LCD_VDD_EN 			IMX_GPIO_NR(4, 7)	
 #endif
 
 #define SPI1_CS0                IMX_GPIO_NR(2,30)

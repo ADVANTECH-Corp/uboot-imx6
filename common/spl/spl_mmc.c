@@ -16,7 +16,48 @@
 #include <mmc.h>
 #include <image.h>
 
+#ifdef CONFIG_ADVANTECH
+#include <stdlib.h>
+#endif
 DECLARE_GLOBAL_DATA_PTR;
+
+#ifdef CONFIG_ADVANTECH
+static int spl_mmc_check_crc(unsigned int dev,struct mmc *mmc)
+{
+        u32 n;
+        /* read crc file */
+        char tag[512];
+        char crc[512];
+	debug("spl check crc\n");
+        
+	n = mmc->block_dev.block_read(&mmc->block_dev, 0x02, 1, (void *) 0x22100000);
+        if(n != 1)
+                return 1;
+
+        memcpy(tag, (void *) 0x22100000, 512);
+        //tag[9] = '\0';
+        //printf("crc file %s\n", tag);
+
+        /* make uboot crc */
+        n = mmc->block_dev.block_read(&mmc->block_dev, 0x03, 0x4b0, (void *) 0x22000000);
+        if(n != 0x4b0)
+                return 1;
+
+        *(int *)0x21f00000 = crc32 (0, (const uchar *) 0x22000000, 0x96000);
+        sprintf(crc, "%08x", *(int *)0x21f00000);
+        //crc[9] = '\0';
+        //printf("uboot crc %s\n", crc);
+
+        /* verrify crc */
+        if(memcmp(tag, crc, 8))
+        {
+                printf("spl: mmc dev %d - crc error\n", dev);
+                return 1;
+        }
+        return 0;
+}
+#endif
+
 
 static int mmc_load_legacy(struct spl_image_info *spl_image, struct mmc *mmc,
 			   ulong sector, struct image_header *header)
@@ -32,7 +73,6 @@ static int mmc_load_legacy(struct spl_image_info *spl_image, struct mmc *mmc,
 	/* convert size to sectors - round up */
 	image_size_sectors = (spl_image->size + mmc->read_bl_len - 1) /
 			     mmc->read_bl_len;
-
 	/* Read the header too to avoid extra memcpy */
 	count = blk_dread(mmc_get_blk_desc(mmc), sector, image_size_sectors,
 			  (void *)(ulong)spl_image->load_addr);
@@ -99,11 +139,32 @@ end:
 int spl_mmc_get_device_index(u32 boot_device)
 {
 	switch (boot_device) {
+#ifdef CONFIG_ADVANTECH
+#if 0
+	case CONFIG_SD_DEV_NUM:
+		return CONFIG_SD_DEV_NUM;
+#ifdef CONFIG_CARRIERSD_DEV_NUM
+	case CONFIG_CARRIERSD_DEV_NUM:
+		return CONFIG_CARRIERSD_DEV_NUM;
+#endif
+	case CONFIG_EMMC_DEV_NUM:  	 
+		return CONFIG_EMMC_DEV_NUM;
+#endif
+	case BOOT_DEVICE_MMC1:
+		return CONFIG_SD_DEV_NUM;
+	case BOOT_DEVICE_MMC2:
+		return CONFIG_EMMC_DEV_NUM;
+#ifdef CONFIG_CARRIERSD_DEV_NUM
+	case BOOT_DEVICE_MMC2_2:
+		return CONFIG_CARRIERSD_DEV_NUM;
+#endif
+#else
 	case BOOT_DEVICE_MMC1:
 		return 0;
 	case BOOT_DEVICE_MMC2:
 	case BOOT_DEVICE_MMC2_2:
 		return 1;
+#endif
 	}
 
 #ifdef CONFIG_SPL_LIBCOMMON_SUPPORT
@@ -119,7 +180,6 @@ static int spl_mmc_find_device(struct mmc **mmcp, u32 boot_device)
 	struct udevice *dev;
 #endif
 	int err, mmc_dev;
-
 	mmc_dev = spl_mmc_get_device_index(boot_device);
 	if (mmc_dev < 0)
 		return mmc_dev;
@@ -287,7 +347,6 @@ int spl_mmc_load_image(struct spl_image_info *spl_image,
 	u32 boot_mode;
 	int err = 0;
 	__maybe_unused int part;
-
 	err = spl_mmc_find_device(&mmc, bootdev->boot_device);
 	if (err)
 		return err;
@@ -300,6 +359,12 @@ int spl_mmc_load_image(struct spl_image_info *spl_image,
 		return err;
 	}
 
+
+#ifdef CONFIG_ADVANTECH
+	err = spl_mmc_check_crc(bootdev->boot_device, mmc);
+	if (err) 
+		return err;
+#endif
 	boot_mode = spl_boot_mode(bootdev->boot_device);
 	err = -EINVAL;
 	switch (boot_mode) {
@@ -363,7 +428,12 @@ int spl_mmc_load_image(struct spl_image_info *spl_image,
 
 	return err;
 }
-
+#ifdef CONFIG_ADVANTECH
+SPL_LOAD_IMAGE_METHOD("SD", 0, BOOT_DEVICE_MMC1, spl_mmc_load_image);
+SPL_LOAD_IMAGE_METHOD("INAND", 0, BOOT_DEVICE_MMC2, spl_mmc_load_image);
+SPL_LOAD_IMAGE_METHOD("CARRIER SD", 0, BOOT_DEVICE_MMC2_2, spl_mmc_load_image);
+#else
 SPL_LOAD_IMAGE_METHOD("MMC1", 0, BOOT_DEVICE_MMC1, spl_mmc_load_image);
 SPL_LOAD_IMAGE_METHOD("MMC2", 0, BOOT_DEVICE_MMC2, spl_mmc_load_image);
 SPL_LOAD_IMAGE_METHOD("MMC2_2", 0, BOOT_DEVICE_MMC2_2, spl_mmc_load_image);
+#endif

@@ -28,6 +28,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CONFIG_SYS_MONITOR_LEN	(200 * 1024)
 #endif
 
+#if defined(CONFIG_ADVANTECH)
+#define SPL_VERSION_STRING "Adv-Boot SPL " PLAIN_VERSION " (" U_BOOT_DATE " - " \
+                        U_BOOT_TIME ")\n"
+const char __weak version_string[] = SPL_VERSION_STRING;
+#endif
+
 u32 *boot_params_ptr = NULL;
 
 /* Define board data structure */
@@ -211,10 +217,24 @@ int spl_init(void)
 #define BOOT_DEVICE_NONE 0xdeadbeef
 #endif
 
+#ifdef CONFIG_ADVANTECH
+void board_boot_order(u32 *spl_boot_list)
+{
+        switch (spl_boot_device()) {
+        case BOOT_DEVICE_AUTO:
+		spl_boot_list[0] = BOOT_DEVICE_MMC1;
+		spl_boot_list[1] = BOOT_DEVICE_MMC2_2;
+		spl_boot_list[2] = BOOT_DEVICE_SATA;
+		spl_boot_list[3] = BOOT_DEVICE_MMC2;
+		break;
+        }
+}
+#else
 __weak void board_boot_order(u32 *spl_boot_list)
 {
 	spl_boot_list[0] = spl_boot_device();
 }
+#endif
 
 static struct spl_image_loader *spl_ll_find_loader(uint boot_device)
 {
@@ -259,13 +279,32 @@ static int boot_from_devices(struct spl_image_info *spl_image,
 
 	for (i = 0; i < count && spl_boot_list[i] != BOOT_DEVICE_NONE; i++) {
 		struct spl_image_loader *loader;
-
 		loader = spl_ll_find_loader(spl_boot_list[i]);
 #if defined(CONFIG_SPL_SERIAL_SUPPORT) && defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
 		if (loader)
 			printf("Trying to boot from %s\n", loader->name);
 		else
 			puts("SPL: Unsupported Boot Device!\n");
+#endif
+#ifdef CONFIG_ADVANTECH
+		switch (spl_boot_list[i]){
+		case BOOT_DEVICE_MMC1:
+			printf("booting from SD\n");
+			*(int *)0x22200000 = 0x01;
+		break;
+		case BOOT_DEVICE_MMC2_2:
+			printf("booting from Carrier SD\n");
+			*(int *)0x22200000 = 0x05;
+		break;
+		case BOOT_DEVICE_SATA:
+			printf("booting from SATA\n");
+			*(int *)0x22200000 = 0x02;
+		break;
+		case BOOT_DEVICE_MMC2:
+			printf("booting from iNAND\n");
+			*(int *)0x22200000 = 0x03;
+		break;
+		}
 #endif
 		if (loader && !spl_load_image(spl_image, loader))
 			return 0;
@@ -353,9 +392,12 @@ void preloader_console_init(void)
 	serial_init();		/* serial communications setup */
 
 	gd->have_console = 1;
-
+#if defined(CONFIG_ADVANTECH)
+	puts("\n\n" SPL_VERSION_STRING);
+#else
 	puts("\nU-Boot SPL " PLAIN_VERSION " (" U_BOOT_DATE " - " \
 			U_BOOT_TIME ")\n");
+#endif
 #ifdef CONFIG_SPL_DISPLAY_PRINT
 	spl_display_print();
 #endif

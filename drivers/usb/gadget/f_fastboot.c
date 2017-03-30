@@ -25,6 +25,7 @@
 #include <linux/compiler.h>
 #include <version.h>
 #include <g_dnl.h>
+#include <sata.h>
 #ifdef CONFIG_FASTBOOT_FLASH_MMC_DEV
 #include <fb_mmc.h>
 #endif
@@ -1392,7 +1393,7 @@ static int _fastboot_parts_load_from_ptable(void)
 	/* mmc boot partition: -1 means no partition, 0 user part., 1 boot part.
 	 * default is no partition, for emmc default user part, except emmc*/
 	int boot_partition = FASTBOOT_MMC_NONE_PARTITION_ID;
-    int user_partition = FASTBOOT_MMC_NONE_PARTITION_ID;
+	int user_partition = FASTBOOT_MMC_NONE_PARTITION_ID;
 
 	struct mmc *mmc;
 	struct blk_desc *dev_desc;
@@ -1861,7 +1862,6 @@ void fastboot_setup(void)
 
 	/*get the fastboot dev*/
 	_fastboot_setup_dev();
-
 
 	/*load partitions information for the fastboot dev*/
 	_fastboot_load_partitions();

@@ -14,10 +14,97 @@
 #include <spl.h>
 #include <asm/imx-common/hab.h>
 
+#ifdef CONFIG_ADVANTECH
+extern const char version_string[];
+#endif
+
+#if defined(CONFIG_ADVANTECH) && defined(CONFIG_BOOT_SELECT)
+#define SABRESD_NANDF_CS0       IMX_GPIO_NR(6, 11) //GPIO6_11
+#define SABRESD_NANDF_CS1       IMX_GPIO_NR(6, 14) //GPIO6_14
+#define SABRESD_NANDF_CS2       IMX_GPIO_NR(6, 15) //GPIO6_15
+#endif
+
+
 #if defined(CONFIG_MX6)
 /* determine boot device from SRC_SBMR1 (BOOT_CFG[4:1]) or SRC_GPR9 register */
 u32 spl_boot_device(void)
 {
+#ifdef CONFIG_ADVANTECH
+#ifdef CONFIG_BOOT_SELECT
+        int board_cs0, board_cs1, board_cs2;
+
+        gpio_request(SABRESD_NANDF_CS0, "Board_CS0");
+        gpio_direction_input(SABRESD_NANDF_CS0);
+
+        gpio_request(SABRESD_NANDF_CS1, "Board_CS1");
+        gpio_direction_input(SABRESD_NANDF_CS1);
+
+        gpio_request(SABRESD_NANDF_CS2, "Board_CS2");
+        gpio_direction_input(SABRESD_NANDF_CS2);
+
+        board_cs0 = gpio_get_value(SABRESD_NANDF_CS0);
+        board_cs1 = gpio_get_value(SABRESD_NANDF_CS1);
+
+        board_cs2 = gpio_get_value(SABRESD_NANDF_CS2);
+
+        printf("Boot_Switch: cs0=%d,cs1=%d,cs2=%d\n",board_cs0,board_cs1,board_cs2);
+        //--------------------------------------------------------------------
+
+        if((!board_cs2)&&(!board_cs1)&&(!board_cs0))            //Carrier SATA//
+        {
+                printf("booting from Carrier SATA\n");
+                *(int *)0x22200000 = 0x02;
+
+                return	BOOT_DEVICE_SATA;
+        }
+        else if((!board_cs2)&&(!board_cs1)&&(board_cs0))        //Carrier SD Card//
+        {
+                printf("booting from Carrier SD Card\n");
+                *(int *)0x22200000 = 0x01;
+
+                return	BOOT_DEVICE_MMC1;
+        }
+        else if((!board_cs2)&&(board_cs1)&&(!board_cs0))        //Carrier eMMC Flash//
+        {
+                printf("booting from Carrier eMMC Flash\n");
+        }
+        else if((!board_cs2)&&(board_cs1)&&(board_cs0))         //Carrier SPI//
+        {
+                printf("booting from Carrier SPI\n");
+                *(int *)0x22200000 = 0x04;
+
+                return	BOOT_DEVICE_SPI;
+        }
+        else if((board_cs2)&&(!board_cs1)&&(!board_cs0))        //Module device//
+        {
+                printf("booting from Module device\n");
+        }
+        else if((board_cs2)&&(!board_cs1)&&(board_cs0))         //Remote boot//
+        {
+                printf("booting from Remote boot\n");
+        }
+        else if((board_cs2)&&(board_cs1)&&(!board_cs0))         //Module eMMC Flash//
+        {
+                printf("booting from Module eMMC Flash\n");
+                *(int *)0x22200000 = 0x03;
+
+                return BOOT_DEVICE_MMC2;
+        }
+        else if((board_cs2)&&(board_cs1)&&(board_cs0))          //Module SPI//
+        {
+                printf("booting from Module SPI\n");
+        }
+        else
+        {
+                printf("booting not support\n");
+        }
+        //--------------------------------------------------------------------
+#else
+        /* We use BOOT_DEVICE_AUTO for auto boot device selection */
+        return BOOT_DEVICE_AUTO;
+#endif
+#else
+
 	struct src *psrc = (struct src *)SRC_BASE_ADDR;
 	unsigned int gpr10_boot = readl(&psrc->gpr10) & (1 << 28);
 	unsigned reg = gpr10_boot ? readl(&psrc->gpr9) : readl(&psrc->sbmr1);
@@ -68,6 +155,7 @@ u32 spl_boot_device(void)
 		return BOOT_DEVICE_NAND;
 	}
 	return BOOT_DEVICE_NONE;
+#endif	//CONFIG_ADVANTECH
 }
 #endif
 
@@ -79,6 +167,9 @@ u32 spl_boot_mode(const u32 boot_device)
 	/* for MMC return either RAW or FAT mode */
 	case BOOT_DEVICE_MMC1:
 	case BOOT_DEVICE_MMC2:
+#if defined(CONFIG_ADVANTECH)
+	case BOOT_DEVICE_AUTO:
+#endif
 #if defined(CONFIG_SPL_FAT_SUPPORT)
 		return MMCSD_MODE_FS;
 #elif defined(CONFIG_SUPPORT_EMMC_BOOT)
@@ -117,3 +208,32 @@ __weak void __noreturn jump_to_image_no_args(struct spl_image_info *spl_image)
 }
 
 #endif
+
+#ifdef CONFIG_SPL_BOARD_INIT
+void spl_board_init(void)
+{
+        char *pch,*s;
+        char tmp[256];
+
+        /* log adv version */
+        pch=strchr(version_string,'2');
+        if (pch!=NULL)
+        {
+                s=strchr(pch,' ');
+                strncpy(tmp, pch, s-pch);
+                tmp[s-pch]='\0';
+                strcpy((void *)0x22300000, tmp);
+        }
+
+        /* forword memory size to uboot */
+        *(unsigned int *)0x22400000 = PHYS_SDRAM_SIZE;
+
+        /* record ddr bit, 32 or 64 bit */
+#ifdef CONFIG_DDR_32BIT
+        *(unsigned int *)0x22500000 = 32;
+#else
+        *(unsigned int *)0x22500000 = 64;
+#endif
+}
+#endif
+

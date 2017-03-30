@@ -23,7 +23,7 @@
 #include <common.h>
 #include <spi.h>
 #include <spi_flash.h>
-#include <asm/errno.h>
+#include <errno.h>
 #include <linux/types.h>
 #include <malloc.h>
 
