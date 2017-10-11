@@ -18,7 +18,6 @@
 #include <malloc.h>
 #include <dm/root.h>
 #include <linux/compiler.h>
-
 DECLARE_GLOBAL_DATA_PTR;
 
 #ifndef CONFIG_SYS_UBOOT_START
@@ -191,14 +190,14 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 		printf("BOOT_DEVICE_AUTO\n");
 #ifdef CONFIG_SPL_MMC_SUPPORT
 		/* 1. SD card */
-		if (!spl_mmc_load_image(CONFIG_SD_DEV_NUM)) {
+		if (spl_mmc_load_image(CONFIG_SD_DEV_NUM) == 0) {
 			printf("booting from SD\n");
 			*(int *)0x22200000 = 0x01;
 		} else
 #endif
 #ifdef CONFIG_CARRIERSD_DEV_NUM
 		/* 5. Carrier SD card for ROM-7421 */
-		if (!spl_mmc_load_image(CONFIG_CARRIERSD_DEV_NUM)) {
+		if (spl_mmc_load_image(CONFIG_CARRIERSD_DEV_NUM) == 0) {
 			printf("booting from Carrier SD\n");
 			*(int *)0x22200000 = 0x05;
 		} else
@@ -212,7 +211,7 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 #endif
 #ifdef CONFIG_SPL_MMC_SUPPORT
 		/* 3. eMMC flash */
-		if(!spl_mmc_load_image(CONFIG_EMMC_DEV_NUM)) {
+		if(spl_mmc_load_image(CONFIG_EMMC_DEV_NUM) == 0) {
 			printf("booting from iNAND\n");
 			*(int *)0x22200000 = 0x03;
 		} else

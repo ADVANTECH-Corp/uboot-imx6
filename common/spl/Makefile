@@ -19,11 +19,11 @@ obj-$(CONFIG_SPL_YMODEM_SUPPORT) += spl_ymodem.o
 obj-$(CONFIG_SPL_NAND_SUPPORT) += spl_nand.o
 obj-$(CONFIG_SPL_ONENAND_SUPPORT) += spl_onenand.o
 obj-$(CONFIG_SPL_NET_SUPPORT) += spl_net.o
-ifdef CONFIG_ADVANTECH
-obj-$(CONFIG_SPL_MMC_SUPPORT) += spl_mmc_advantech.o
-else
+#ifdef CONFIG_ADVANTECH
+#obj-$(CONFIG_SPL_MMC_SUPPORT) += spl_mmc_advantech.o
+#else
 obj-$(CONFIG_SPL_MMC_SUPPORT) += spl_mmc.o
-endif
+#endif
 obj-$(CONFIG_SPL_USB_SUPPORT) += spl_usb.o
 obj-$(CONFIG_SPL_FAT_SUPPORT) += spl_fat.o
 obj-$(CONFIG_SPL_EXT_SUPPORT) += spl_ext.o

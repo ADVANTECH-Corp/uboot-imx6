@@ -466,4 +466,23 @@
 #define	CONFIG_ANDROID_RECOVERY
 #endif /* CONFIG_ADV_OTA_SUPPORT */
 
+/* Falcon Mode */
+#define CONFIG_CMD_SPL
+#define CONFIG_SPL_OS_BOOT
+#define CONFIG_SYS_SPL_ARGS_ADDR       0x18000000
+#define CONFIG_CMD_SPL_WRITE_SIZE      (128 * SZ_1K)
+#define CONFIG_SPL_ENV_SUPPORT
+
+/* Falcon Mode - MMC support: args@1MB kernel@2MB */
+#if 0
+#define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR  0x800   /* 1MB */
+#endif
+#define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTOR  0x400000   /* 2G */
+#define CONFIG_SYS_MMCSD_RAW_MODE_ARGS_SECTORS (CONFIG_CMD_SPL_WRITE_SIZE / 512)
+#if 0
+#define CONFIG_SYS_MMCSD_RAW_MODE_KERNEL_SECTOR        0x1000  /* 2MB */
+#endif
+#define CONFIG_SYS_MMCSD_RAW_MODE_KERNEL_SECTOR        0x400800  /* 2G+1M */
+
+
 #endif                         /* __MX6QSABRE_COMMON_CONFIG_H */

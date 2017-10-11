@@ -6,6 +6,7 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
+#define	DEBUG	1
 #include <common.h>
 #include <dm.h>
 #include <spl.h>
@@ -15,8 +16,46 @@
 #include <errno.h>
 #include <mmc.h>
 #include <image.h>
-
+#include <stdlib.h>
 DECLARE_GLOBAL_DATA_PTR;
+
+#ifdef CONFIG_ADVANTECH
+static int spl_mmc_check_crc(unsigned int dev,struct mmc *mmc)
+{
+        u32 n;
+        /* read crc file */
+        char tag[512];
+        char crc[512];
+	debug("spl check crc\n");
+        
+	n = mmc->block_dev.block_read(&mmc->block_dev, 0x02, 1, (void *) 0x22100000);
+        if(n != 1)
+                return 1;
+
+        memcpy(tag, (void *) 0x22100000, 512);
+        //tag[9] = '\0';
+        //printf("crc file %s\n", tag);
+
+        /* make uboot crc */
+        n = mmc->block_dev.block_read(&mmc->block_dev, 0x03, 0x4b0, (void *) 0x22000000);
+        if(n != 0x4b0)
+                return 1;
+
+        *(int *)0x21f00000 = crc32 (0, (const uchar *) 0x22000000, 0x96000);
+        sprintf(crc, "%08x", *(int *)0x21f00000);
+        //crc[9] = '\0';
+        //printf("uboot crc %s\n", crc);
+
+        /* verrify crc */
+        if(memcmp(tag, crc, 8))
+        {
+                printf("spl: mmc dev %d - crc error\n", dev);
+                return 1;
+        }
+        return 0;
+}
+
+#endif
 
 static int mmc_load_image_raw_sector(struct mmc *mmc, unsigned long sector)
 {
@@ -33,11 +72,12 @@ static int mmc_load_image_raw_sector(struct mmc *mmc, unsigned long sector)
 	if (count == 0)
 		goto end;
 
+#ifndef CONFIG_ADVANTECH
 	if (image_get_magic(header) != IH_MAGIC) {
 		puts("bad magic\n");
 		return -1;
 	}
-
+#endif
 	spl_parse_image_header(header);
 
 	/* convert size to sectors - round up */
@@ -65,11 +105,22 @@ end:
 int spl_mmc_get_device_index(u32 boot_device)
 {
 	switch (boot_device) {
+#ifdef CONFIG_ADVANTECH
+	case CONFIG_SD_DEV_NUM:
+		return CONFIG_SD_DEV_NUM;
+#ifdef CONFIG_CARRIERSD_DEV_NUM
+	case CONFIG_CARRIERSD_DEV_NUM:
+		return CONFIG_CARRIERSD_DEV_NUM;
+#endif
+	case CONFIG_EMMC_DEV_NUM:  	 
+		return CONFIG_EMMC_DEV_NUM;
+#else
 	case BOOT_DEVICE_MMC1:
 		return 0;
 	case BOOT_DEVICE_MMC2:
 	case BOOT_DEVICE_MMC2_2:
 		return 1;
+#endif
 	}
 
 #ifdef CONFIG_SPL_LIBCOMMON_SUPPORT
@@ -230,7 +281,6 @@ int spl_mmc_load_image(u32 boot_device)
 	u32 boot_mode;
 	int err = 0;
 	__maybe_unused int part;
-
 	err = spl_mmc_find_device(&mmc, boot_device);
 	if (err)
 		return err;
@@ -242,7 +292,11 @@ int spl_mmc_load_image(u32 boot_device)
 #endif
 		return err;
 	}
-
+	
+        err = spl_mmc_check_crc(boot_device,mmc);
+        if (err) 
+                return err;
+	
 	boot_mode = spl_boot_mode();
 	err = -EINVAL;
 	switch (boot_mode) {

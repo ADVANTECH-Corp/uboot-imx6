@@ -5,7 +5,8 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
-
+#define DEBUG 1
+#include <environment.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux.h>
@@ -1701,6 +1702,27 @@ static struct mx6_ddr3_cfg mem_ddr = {
 	.trcmin = 4875,
 	.trasmin = 3500,
 };
+
+
+#ifdef CONFIG_SPL_OS_BOOT
+/* return 1 if we wish to boot to uboot vs os (falcon mode) */
+int spl_start_uboot(void)
+{
+       int ret = 1;
+
+       debug("%s\n", __func__);
+#ifdef CONFIG_SPL_ENV_SUPPORT
+       env_init();
+       env_relocate_spec();
+       debug("boot_os=%s\n", getenv("boot_os"));
+       if (getenv_yesno("boot_os") == 1)
+               ret = 0;
+#endif
+       printf("%s booting %s\n", __func__, ret ? "uboot" : "linux");
+       return ret;
+}
+#endif
+
 
 static void ccgr_init(void)
 {
