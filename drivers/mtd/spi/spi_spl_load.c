@@ -14,7 +14,7 @@
 #include <spi_flash.h>
 #include <errno.h>
 #include <spl.h>
-
+#ifndef CONFIG_ADVANTECH
 #ifdef CONFIG_SPL_OS_BOOT
 /*
  * Load the kernel, check for a valid header we can parse, and if found load
@@ -42,6 +42,7 @@ static int spi_load_image_os(struct spi_flash *flash,
 
 	return 0;
 }
+#endif
 #endif
 
 #if defined (CONFIG_ADVANTECH) && defined(CONFIG_SPI_BOOT)
@@ -127,9 +128,10 @@ int spl_spi_load_image(void)
 
 	/* use CONFIG_SYS_TEXT_BASE as temporary storage area */
 	header = (struct image_header *)(CONFIG_SYS_TEXT_BASE);
-
+#ifndef CONFIG_ADVANTECH
 #ifdef CONFIG_SPL_OS_BOOT
 	if (spl_start_uboot() || spi_load_image_os(flash, header))
+#endif
 #endif
 	{
 		/* Load u-boot, mkimage header is 64 bytes. */
