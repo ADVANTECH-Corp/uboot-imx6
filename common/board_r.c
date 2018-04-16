@@ -864,7 +864,7 @@ int board_set_boot_device(void)
 #ifdef CONFIG_ANDROID_SUPPORT
 	setenv("bootargs_adv", buf);
 #else
-	setenv("bootargs", buf);
+	setenv("version", buf);
 #endif
 	// check emmc exists or not
 	emmc_exist = check_emmc_exist();
