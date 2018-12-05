@@ -1162,6 +1162,7 @@ static void update_fdt_with_owned_resources(void *blob)
 				continue;
 			}
 
+#if 0
 			debug("power-domains phandle 0x%x, addr 0x%x, resource id %u\n",
 				fdt32_to_cpu(*php), addr, rsrc_id);
 
@@ -1176,6 +1177,7 @@ static void update_fdt_with_owned_resources(void *blob)
 					printf("Unable to disable %s, err=%s\n",
 						fdt_get_name(blob, offset, NULL), fdt_strerror(rc));
 			}
+#endif
 		}
 	}
 }
