@@ -1,6 +1,0 @@
-test_base_sw.c:72:5:cdn_apb_read	0	static
-test_base_sw.c:81:5:cdn_apb_write	0	static
-test_base_sw.c:89:5:cdn_sapb_read	0	static
-test_base_sw.c:98:5:cdn_sapb_write	0	static
-test_base_sw.c:105:6:cdn_sleep	32	static
-test_base_sw.c:110:6:cdn_usleep	0	static

@@ -1,3 +1,0 @@
-efi_image_loader.c:21:21:efi_return_handle	0	static
-efi_image_loader.c:73:13:invalidate_icache_all	0	static
-efi_image_loader.c:83:7:efi_load_pe	144	static

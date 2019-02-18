@@ -1,2 +1,0 @@
-xhci-imx8m.c:113:5:xhci_hcd_init	64	static
-xhci-imx8m.c:147:6:xhci_hcd_stop	0	static

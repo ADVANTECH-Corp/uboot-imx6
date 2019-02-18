@@ -1,1 +1,0 @@
-cmd_examples/standalone/hello_world := aarch64-poky-linux-ld.bfd   -g -Ttext 0xc100000 -o examples/standalone/hello_world -e hello_world examples/standalone/hello_world.o examples/standalone/libstubs.o -L /home/poky/2.4/sysroots/aarch64-poky-linux/usr/lib/aarch64-poky-linux/7.3.0 -lgcc

@@ -1,2 +1,0 @@
-iomux.c:14:6:iomux_printdevs	64	static
-iomux.c:27:5:iomux_doenv	96	static

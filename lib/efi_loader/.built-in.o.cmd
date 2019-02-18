@@ -1,1 +1,0 @@
-cmd_lib/efi_loader/built-in.o :=  aarch64-poky-linux-ld.bfd     -r -o lib/efi_loader/built-in.o lib/efi_loader/efi_image_loader.o lib/efi_loader/efi_boottime.o lib/efi_loader/efi_runtime.o lib/efi_loader/efi_console.o lib/efi_loader/efi_memory.o lib/efi_loader/efi_disk.o lib/efi_loader/efi_net.o lib/efi_loader/efi_smbios.o 

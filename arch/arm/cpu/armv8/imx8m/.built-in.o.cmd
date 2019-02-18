@@ -1,1 +1,0 @@
-cmd_arch/arm/cpu/armv8/imx8m/built-in.o :=  aarch64-poky-linux-ld.bfd     -r -o arch/arm/cpu/armv8/imx8m/built-in.o arch/arm/cpu/armv8/imx8m/lowlevel_init.o arch/arm/cpu/armv8/imx8m/clock.o arch/arm/cpu/armv8/imx8m/clock_slice.o arch/arm/cpu/armv8/imx8m/soc.o arch/arm/cpu/armv8/imx8m/video_common.o 
