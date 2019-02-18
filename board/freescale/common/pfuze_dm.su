@@ -1,0 +1,2 @@
+pfuze_dm.c:12:5:pfuze_mode_init	80	static
+pfuze_dm.c:50:17:pfuze_common_init	48	static

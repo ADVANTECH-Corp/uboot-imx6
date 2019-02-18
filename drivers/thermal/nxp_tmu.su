@@ -1,0 +1,5 @@
+nxp_tmu.c:79:12:read_temperature	32	static
+nxp_tmu.c:93:5:nxp_tmu_get_temp	96	static
+nxp_tmu.c:248:12:nxp_tmu_ofdata_to_platdata	144	static
+nxp_tmu.c:217:12:nxp_tmu_bind	48	static
+nxp_tmu.c:201:12:nxp_tmu_probe	64	static

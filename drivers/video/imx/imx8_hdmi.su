@@ -1,0 +1,2 @@
+imx8_hdmi.c:250:5:imx8_hdmi_enable	96	static
+imx8_hdmi.c:270:6:imx8_hdmi_disable	32	static

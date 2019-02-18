@@ -1,0 +1,3 @@
+panic.c:19:13:panic_finish	16	static
+panic.c:32:6:panic_str	16	static
+panic.c:38:6:panic	144	static

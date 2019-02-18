@@ -1,0 +1,4 @@
+API_AFE.c:54:6:afe_write	32	static
+API_AFE.c:73:16:afe_read	48	static
+API_AFE.c:94:6:set_field_value	0	static
+API_AFE.c:112:5:set_reg_value	16	static

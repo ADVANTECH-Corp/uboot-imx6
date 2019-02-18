@@ -1,0 +1,2 @@
+spl.c:99:5:spl_boot_device	16	static
+spl.c:121:5:spl_boot_mode	16	static

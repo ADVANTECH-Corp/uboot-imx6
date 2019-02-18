@@ -1,0 +1,6 @@
+cpu.c:90:5:get_imx_reset_cause	0	static
+cpu.c:151:13:get_imx_type	0	static
+cpu.c:191:5:print_cpuinfo	64	static
+cpu.c:273:5:cpu_eth_init	0	static
+cpu.c:289:5:cpu_mmc_init	0	static
+cpu.c:309:6:arch_preboot_os	0	static

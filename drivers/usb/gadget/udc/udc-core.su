@@ -1,0 +1,13 @@
+udc-core.c:223:13:usb_gadget_remove_driver	32	static
+udc-core.c:159:13:usb_udc_release	0	static
+udc-core.c:49:5:usb_gadget_map_request	0	static
+udc-core.c:62:6:usb_gadget_unmap_request	0	static
+udc-core.c:82:6:usb_gadget_giveback_request	0	static
+udc-core.c:91:6:usb_gadget_set_state	0	static
+udc-core.c:109:6:usb_gadget_udc_reset	32	static
+udc-core.c:176:5:usb_add_gadget_udc_release	32	static
+udc-core.c:217:5:usb_add_gadget_udc	0	static
+udc-core.c:243:6:usb_del_gadget_udc	0	static
+udc-core.c:298:5:usb_gadget_probe_driver	48	static
+udc-core.c:323:5:usb_gadget_register_driver	0	static
+udc-core.c:329:5:usb_gadget_unregister_driver	32	static

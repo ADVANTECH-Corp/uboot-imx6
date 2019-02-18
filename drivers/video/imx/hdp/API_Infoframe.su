@@ -1,0 +1,4 @@
+API_Infoframe.c:69:23:infoframeSet	80	static
+API_Infoframe.c:127:16:cdn_api_infoframeset	0	static
+API_Infoframe.c:135:16:cdn_api_infoframesetnoactiveidle	0	static
+API_Infoframe.c:143:16:cdn_api_infoframeremove	16	static

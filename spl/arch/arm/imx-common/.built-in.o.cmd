@@ -1,0 +1,1 @@
+cmd_spl/arch/arm/imx-common/built-in.o :=  aarch64-poky-linux-ld.bfd     -r -o spl/arch/arm/imx-common/built-in.o spl/arch/arm/imx-common/iomux-v3.o spl/arch/arm/imx-common/imx_bootaux.o spl/arch/arm/imx-common/i2c-mxv7.o spl/arch/arm/imx-common/video.o spl/arch/arm/imx-common/cpu.o spl/arch/arm/imx-common/sip.o spl/arch/arm/imx-common/misc.o spl/arch/arm/imx-common/spl.o 

@@ -1,0 +1,3 @@
+wait_ddrphy_training_complete.c:80:6:wait_ddrphy_training_complete	0	static
+ddr_init.c:32:6:lpddr4_800MHz_cfg_umctl2	0	static
+ddr_init.c:151:6:ddr_init	48	static

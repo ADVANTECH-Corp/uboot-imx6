@@ -1,0 +1,1 @@
+cmd_spl/board/freescale/imx8mq_evk/built-in.o :=  aarch64-poky-linux-ld.bfd     -r -o spl/board/freescale/imx8mq_evk/built-in.o spl/board/freescale/imx8mq_evk/imx8m_evk.o spl/board/freescale/imx8mq_evk/spl.o spl/board/freescale/imx8mq_evk/ddr/ddr_init.o spl/board/freescale/imx8mq_evk/ddr/ddrphy_train.o spl/board/freescale/imx8mq_evk/ddr/helper.o 

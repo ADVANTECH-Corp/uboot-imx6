@@ -1,0 +1,9 @@
+part.c:64:18:blk_get_dev	32	static
+part.c:107:6:dev_print	32	static
+part.c:213:6:part_init	48	static
+part.c:277:6:part_print	0	static
+part.c:296:5:part_get_info	16	static
+part.c:330:5:blk_get_device_by_str	96	static
+part.c:392:5:blk_get_device_part_str	192	static
+part.c:619:5:part_get_info_by_name	80	static
+part.c:645:6:part_set_generic_name	0	static

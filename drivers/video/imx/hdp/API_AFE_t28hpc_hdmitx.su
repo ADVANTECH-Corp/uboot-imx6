@@ -1,0 +1,3 @@
+API_AFE_t28hpc_hdmitx.c:89:6:aux_cfg_t28hpc	16	static
+API_AFE_t28hpc_hdmitx.c:110:5:phy_cfg_t28hpc	272	static
+API_AFE_t28hpc_hdmitx.c:1840:5:hdmi_tx_t28hpc_power_config_seq	48	static

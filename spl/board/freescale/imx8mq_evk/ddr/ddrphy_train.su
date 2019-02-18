@@ -1,0 +1,7 @@
+ddrphy_train.c:16:6:sscgpll_bypass_enable	0	static
+ddrphy_train.c:25:6:sscgpll_bypass_disable	0	static
+ddrphy_train.c:34:14:wait_pll_lock	0	static
+ddrphy_train.c:41:6:ddr_pll_config_freq	16	static
+ddrphy_train.c:74:6:dwc_ddrphy_phyinit_userCustom_E_setDfiClk.part.0	0	static
+ddrphy_train.c:74:6:dwc_ddrphy_phyinit_userCustom_E_setDfiClk	16	static
+ddrphy_train.c:87:6:lpddr4_800M_cfg_phy	224	static

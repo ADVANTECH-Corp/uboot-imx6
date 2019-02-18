@@ -1,0 +1,16 @@
+clock.c:24:6:enable_ocotp_clk	0	static
+clock.c:30:5:enable_i2c_clk	16	static
+clock.c:41:5:decode_frac_pll	16	static
+clock.c:100:5:decode_sscg_pll	16	static
+clock.c:267:5:get_root_src_clk	0	static
+clock.c:305:5:get_root_clk	48	static
+clock.c:327:14:mxc_get_clock	32	static
+clock.c:347:5:imx_get_uartclk	0	static
+clock.c:357:5:frac_pll_init	0	static
+clock.c:395:5:sscg_pll_init	48	static
+clock.c:465:6:mxs_set_lcdclk	0	static
+clock.c:478:6:dram_pll_init	32	static
+clock.c:546:5:clock_init	16	static
+clock.c:666:5:set_clk_qspi	16	static
+clock.c:678:5:set_clk_enet	32	static
+clock.c:732:5:imx_get_fecclk	0	static

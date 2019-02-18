@@ -1,0 +1,8 @@
+video_common.c:30:29:imx8m_get_gmode	0	static
+video_common.c:35:6:imx8m_show_gmode	48	static
+video_common.c:58:16:imx8m_get_gd	0	static
+video_common.c:120:6:imx8m_create_color_bar	0	static
+video_common.c:632:6:imx8m_display_shutdown	0	static
+video_common.c:655:7:video_hw_init	48	static
+video_common.c:699:6:imx8m_fb_disable	16	static
+video_common.c:711:5:imx8m_fb_init	48	static

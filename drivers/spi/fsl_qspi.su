@@ -1,0 +1,12 @@
+fsl_qspi.c:148:12:qspi_read32	0	static
+fsl_qspi.c:154:13:qspi_write32	0	static
+fsl_qspi.c:576:13:qspi_op_read	144	static
+fsl_qspi.c:823:5:qspi_xfer	112	static
+fsl_qspi.c:896:6:qspi_module_disable	16	static
+fsl_qspi.c:908:6:qspi_cfg_smpr	16	static
+fsl_qspi.c:937:19:spi_setup_slave	32	static
+fsl_qspi.c:1037:6:spi_free_slave	0	static
+fsl_qspi.c:1044:5:spi_claim_bus	0	static
+fsl_qspi.c:1049:6:spi_release_bus	0	static
+fsl_qspi.c:1054:5:spi_xfer	0	static
+fsl_qspi.c:1062:6:spi_init	0	static

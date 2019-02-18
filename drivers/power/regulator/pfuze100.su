@@ -1,0 +1,8 @@
+pfuze100.c:313:12:pfuze100_regulator_mode	48	static
+pfuze100.c:554:12:pfuze100_regulator_set_mode	32	static
+pfuze100.c:542:12:pfuze100_regulator_get_mode	32	static
+pfuze100.c:508:12:pfuze100_regulator_get_value	48	static
+pfuze100.c:520:12:pfuze100_regulator_set_value	48	static
+pfuze100.c:537:12:pfuze100_regulator_set_enable	64	static
+pfuze100.c:259:12:pfuze100_regulator_probe	48	static
+pfuze100.c:525:13:pfuze100_regulator_get_enable	48	static

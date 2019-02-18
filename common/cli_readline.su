@@ -1,0 +1,4 @@
+cli_readline.c:24:14:delete_char.part.0	64	static
+cli_readline.c:202:13:cread_add_char	48	static
+cli_readline.c:522:5:cli_readline_into_buffer	144	static
+cli_readline.c:510:5:cli_readline	0	static

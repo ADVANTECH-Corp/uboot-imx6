@@ -1,0 +1,4 @@
+pfuze100.c:27:12:pfuze100_reg_count	0	static
+pfuze100.c:53:12:pfuze100_bind	32	static
+pfuze100.c:32:12:pfuze100_write	32	static
+pfuze100.c:43:12:pfuze100_read	32	static
