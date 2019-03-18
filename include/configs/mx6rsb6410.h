@@ -161,8 +161,8 @@
 #define LCD_BKLT_PWM 		IMX_GPIO_NR(0, 9)
 #define LCD_BKLT_EN 		IMX_GPIO_NR(6, 9)
 #define LCD_VDD_EN 		IMX_GPIO_NR(6, 7)	
-#define LCD_BKLT_EN_VALUE 1
-#define LCD_VDD_EN_VALUE 1
+#define LCD_BKLT_EN_INVERT
+#define LCD_VDD_EN_INVERT
 #endif
 
 
