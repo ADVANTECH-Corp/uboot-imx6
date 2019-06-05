@@ -102,6 +102,7 @@
 #define CONFIG_PHY_ATHEROS
 #endif
 
+#undef CONFIG_DEFAULT_FDT_FILE
 #define	CONFIG_DEFAULT_FDT_FILE	"fsl-imx8mq-rom5720-a1.dtb"
 
 /*
