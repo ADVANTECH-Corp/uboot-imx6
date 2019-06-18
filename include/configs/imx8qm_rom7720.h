@@ -117,7 +117,7 @@
 
 #if (CONFIG_FEC_ENET_DEV == 0)
 #define IMX_FEC_BASE			0x5B040000
-#define CONFIG_FEC_MXC_PHYADDR          0x0
+#define CONFIG_FEC_MXC_PHYADDR          0x4
 #define CONFIG_ETHPRIME                 "eth0"
 #elif (CONFIG_FEC_ENET_DEV == 1)
 #define IMX_FEC_BASE			0x5B050000
