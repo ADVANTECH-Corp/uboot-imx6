@@ -63,16 +63,6 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_SPEED_LOW | PAD_CTL_DSE_80ohm |			\
 	PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
 
-/* Improve RGMII_TXCLK Duty cycle from HW Cindy */
-#ifdef CONFIG_ADVANTECH
-#define ENET_PAD_CTRL  (PAD_CTL_PUE |				\
-	PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED |		\
-	PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
-#else
-#define ENET_PAD_CTRL  (PAD_CTL_PUS_100K_UP |			\
-	PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
-#endif
-
 #define SPI_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_SPEED_MED | \
 		      PAD_CTL_DSE_40ohm | PAD_CTL_SRE_FAST)
 
@@ -80,8 +70,16 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm | PAD_CTL_HYS |	\
 	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
 
+/* Improve RGMII_TXCLK Duty cycle from HW Cindy */
+#ifdef CONFIG_ADVANTECH
+#define DISABLE_PAD_CTL_PKE 0xFEFFF
+#define ENET_PAD_CTRL  (PAD_CTL_PUE |				\
+	PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED |		\
+	PAD_CTL_DSE_40ohm | PAD_CTL_HYS) & DISABLE_PAD_CTL_PKE
+#else
 #define EPDC_PAD_CTRL    (PAD_CTL_PKE | PAD_CTL_SPEED_MED |	\
 	PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+#endif
 
 #define OTG_ID_PAD_CTRL (PAD_CTL_PKE | PAD_CTL_PUE |		\
 	PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW |		\
@@ -108,9 +106,75 @@ int enable_AXI_cache(void)
 
 #define KEY_VOL_UP	IMX_GPIO_NR(1, 4)
 
+#ifdef CONFIG_ADVANTECH
+void tune_ddr(void)
+{
+#if defined(CONFIG_TARGET_MX6ROM7420A1_2G) || defined(CONFIG_TARGET_MX6ROM7420A1_1G)
+  /* add for ROM-7420 Quar Core 2G booted failed from advload V2.330 */
+  unsigned int *ADD_MMDC_P1_MPWLDECTRL0;
+  unsigned int *ADD_MMDC_P1_MPWLDECTRL1;
+  char advboot_version[128];
+  char* pch = NULL;
+  ADD_MMDC_P1_MPWLDECTRL0 = (unsigned int *)MX6_MMDC_P1_MPWLDECTRL0;
+  ADD_MMDC_P1_MPWLDECTRL1 = (unsigned int *)MX6_MMDC_P1_MPWLDECTRL1; 
+
+	strncpy(advboot_version, (void *)0x22300000, 128);
+	pch = strstr (advboot_version, "rom7420_2G");
+	
+	if (pch != NULL || gd->ram_size == (2u * 1024 * 1024 * 1024))
+	{
+	  *ADD_MMDC_P1_MPWLDECTRL0 = 0x001F001F;
+	  *ADD_MMDC_P1_MPWLDECTRL1 = 0x001F001F;
+	}
+#endif
+}
+#endif  
+
 int dram_init(void)
 {
+#ifdef CONFIG_ADVANTECH
+	char *under_line_1, *under_line_2, *under_line_3;
+	char memory_size[30];
+	char advboot_version[128];
+
+	/* Read memory size sent from Adv-Boot */
+	gd->ram_size = (*(unsigned int *)0x22400000);
+	if (gd->ram_size != (2u * 1024 * 1024 * 1024) &&
+		gd->ram_size != (1u * 1024 * 1024 * 1024) &&
+		gd->ram_size != (512 * 1024 * 1024))
+	{
+		strncpy(advboot_version, (void *)0x22300000, 128);
+	
+		under_line_1 = strchr(advboot_version,'_');
+		under_line_2 = strchr(under_line_1+1,'_');
+		under_line_3 = strchr(under_line_2+1,'_');
+		
+		strncpy(memory_size, under_line_2+1, under_line_3-under_line_2-1);
+		memory_size[under_line_3-under_line_2]='\0';		
+
+		if (0 == strcmp(memory_size, "2G"))
+		{
+			gd->ram_size = (2u * 1024 * 1024 * 1024);
+		}
+		else if (0 == strcmp(memory_size, "1G"))
+		{
+			gd->ram_size = (1u * 1024 * 1024 * 1024);
+		}
+		else if (0 == strcmp(memory_size, "512M"))
+		{
+			gd->ram_size = (512 * 1024 * 1024);
+		}
+		else
+		{		
+			gd->ram_size = PHYS_SDRAM_SIZE;
+		}
+	}
+
+  
+  tune_ddr();
+#else
 	gd->ram_size = imx_ddr_size();
+#endif
 	return 0;
 }
 
@@ -118,6 +182,14 @@ static iomux_v3_cfg_t const uart1_pads[] = {
 	IOMUX_PADS(PAD_CSI0_DAT10__UART1_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
 	IOMUX_PADS(PAD_CSI0_DAT11__UART1_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
 };
+
+#ifdef	ADV_ENABLE_UART2
+static iomux_v3_cfg_t const uart2_pads[] = {
+	IOMUX_PADS(PAD_EIM_D26__UART2_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
+	IOMUX_PADS(PAD_EIM_D27__UART2_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
+};
+#endif
+
 
 static iomux_v3_cfg_t const enet_pads[] = {
 	IOMUX_PADS(PAD_ENET_MDIO__ENET_MDIO	| MUX_PAD_CTRL(ENET_PAD_CTRL)),
@@ -181,7 +253,7 @@ static iomux_v3_cfg_t const usdhc3_pads[] = {
 	IOMUX_PADS(PAD_SD3_DAT6__SD3_DATA6 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
 	IOMUX_PADS(PAD_SD3_DAT7__SD3_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
 	IOMUX_PADS(PAD_NANDF_D0__GPIO2_IO00    | MUX_PAD_CTRL(NO_PAD_CTRL)), /* CD */
-#ifdef CONFIG_TWO_SD_BOOT
+#ifdef USDHC3_PWREN_GPIO
 	IOMUX_PADS(PAD_NANDF_D2__GPIO2_IO02    | MUX_PAD_CTRL(NO_PAD_CTRL)), /* PWREN */
 #endif
 };
@@ -199,7 +271,7 @@ static iomux_v3_cfg_t const usdhc4_pads[] = {
 	IOMUX_PADS(PAD_SD4_DAT7__SD4_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL)),
 };
 
-#ifdef CONFIG_MXC_SPI
+#ifdef CONFIG_SYS_USE_SPINOR
 static iomux_v3_cfg_t const ecspi1_pads[] = {
 	IOMUX_PADS(PAD_EIM_D16__ECSPI1_SCLK | MUX_PAD_CTRL(SPI_PAD_CTRL)),
 	IOMUX_PADS(PAD_EIM_D17__ECSPI1_MISO | MUX_PAD_CTRL(SPI_PAD_CTRL)),
@@ -207,7 +279,7 @@ static iomux_v3_cfg_t const ecspi1_pads[] = {
 	IOMUX_PADS(PAD_EIM_EB2__ECSPI1_SS0 | MUX_PAD_CTRL(NO_PAD_CTRL)),
 };
 
-static void setup_spi(void)
+static void setup_spinor(void)
 {
 	SETUP_IOMUX_PADS(ecspi1_pads);
 	gpio_request(IMX_GPIO_NR(4, 9), "ECSPI1 CS");
@@ -219,10 +291,6 @@ static void setup_spi(void)
 #endif
 }
 
-int board_spi_cs_gpio(unsigned bus, unsigned cs)
-{
-	return (bus == 0 && cs == 0) ? (IMX_GPIO_NR(4, 9)) : -1;
-}
 #endif
 
 static iomux_v3_cfg_t const rgb_pads[] = {
@@ -317,6 +385,9 @@ iomux_v3_cfg_t const di0_pads[] = {
 static void setup_iomux_uart(void)
 {
 	SETUP_IOMUX_PADS(uart1_pads);
+#ifdef ADV_ENABLE_UART2
+	SETUP_IOMUX_PADS(uart2_pads);
+#endif
 }
 
 #if defined(CONFIG_MX6DL) && defined(CONFIG_MXC_EPDC)
@@ -369,15 +440,9 @@ static iomux_v3_cfg_t const epdc_disable_pads[] = {
 
 #ifdef CONFIG_FSL_ESDHC
 struct fsl_esdhc_cfg usdhc_cfg[3] = {
-#ifndef CONFIG_TWO_SD_BOOT 
 	{USDHC2_BASE_ADDR},
 	{USDHC3_BASE_ADDR},
 	{USDHC4_BASE_ADDR},
-#else
-	{USDHC2_BASE_ADDR},
-	{USDHC4_BASE_ADDR},
-	{USDHC3_BASE_ADDR},
-#endif
 };
 
 int board_mmc_get_env_dev(int devno)
@@ -396,12 +461,16 @@ int board_mmc_getcd(struct mmc *mmc)
 	int ret = 0;
 
 	switch (cfg->esdhc_base) {
+#ifdef USDHC2_CD_GPIO
 	case USDHC2_BASE_ADDR:
 		ret = !gpio_get_value(USDHC2_CD_GPIO);
 		break;
+#endif
+#ifdef USDHC3_CD_GPIO
 	case USDHC3_BASE_ADDR:
 		ret = !gpio_get_value(USDHC3_CD_GPIO);
 		break;
+#endif
 	case USDHC4_BASE_ADDR:
 		ret = 1; /* eMMC/uSDHC4 is always present */
 		break;
@@ -424,51 +493,33 @@ int board_mmc_init(bd_t *bis)
 	 */
 	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
 		switch (i) {
+#ifdef USDHC2_CD_GPIO
 		case 0:
 			SETUP_IOMUX_PADS(usdhc2_pads);
 			gpio_request(USDHC2_CD_GPIO, "USDHC2 CD");
 			gpio_direction_input(USDHC2_CD_GPIO);
-			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+			ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
 			break;
+#endif
+#ifdef USDHC3_CD_GPIO
 		case 1:
-#ifndef	CONFIG_TWO_SD_BOOT
 			SETUP_IOMUX_PADS(usdhc3_pads);
 			gpio_request(USDHC3_CD_GPIO, "USDHC3 CD");
 			gpio_direction_input(USDHC3_CD_GPIO);
-			usdhc_cfg[1].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
-#else
-			SETUP_IOMUX_PADS(usdhc4_pads);
-			usdhc_cfg[1].sdhc_clk = mxc_get_clock(MXC_ESDHC4_CLK);
-#endif
-			break;
-		case 2:
-#ifndef	CONFIG_TWO_SD_BOOT
-			SETUP_IOMUX_PADS(usdhc4_pads);
-			usdhc_cfg[2].sdhc_clk = mxc_get_clock(MXC_ESDHC4_CLK);
-#else
-			SETUP_IOMUX_PADS(usdhc3_pads);
-			gpio_request(USDHC3_CD_GPIO, "USDHC3 CD");
+#ifdef USDHC3_PWREN_GPIO
 			gpio_direction_output(USDHC3_PWREN_GPIO, 0);
-			gpio_direction_input(USDHC3_CD_GPIO);
-			usdhc_cfg[2].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
 #endif
+			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
+			ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
 			break;
-		default:
-			printf("Warning: you configured more USDHC controllers"
-			       "(%d) then supported by the board (%d)\n",
-			       i + 1, CONFIG_SYS_FSL_USDHC_NUM);
-			return -EINVAL;
-		}
-#ifndef CONFIG_TWO_SD_BOOT
-		/* We use index 1 for SD card and index 3 for eMMC */
-		if (i != 1) {
-		ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
-			}
-#else
-		/* ROM-7421: We use index 1 for Micro SD card,  index 3 for eMMC and index 5 for carrier SD card */
-		/* Others: We use index 1 for SD card,  index 3 for eMMC */
-		ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
 #endif
+		case 2:
+			SETUP_IOMUX_PADS(usdhc4_pads);
+			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC4_CLK);
+			ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
+			break;
+		}
 		if (ret)
 			return ret;
 	}
@@ -949,6 +1000,14 @@ int board_early_init_f(void)
 #ifdef CONFIG_ADVANTECH
 	enable_AXI_cache();
 #endif
+#ifdef CONFIG_SYS_USE_SPINOR
+        setup_spinor();
+#endif
+
+#ifdef CONFIG_CMD_SATA
+        setup_sata();
+#endif
+
 	return 0;
 }
 
@@ -995,10 +1054,6 @@ int board_init(void)
 
 #if defined(CONFIG_MX6DL) && defined(CONFIG_MXC_EPDC)
 	setup_epdc();
-#endif
-
-#ifdef CONFIG_SATA
-	setup_sata();
 #endif
 
 #ifdef CONFIG_FEC_MXC
@@ -1785,6 +1840,13 @@ void board_init_f(ulong dummy)
 	/* UART clocks enabled and gd valid - init serial console */
 	preloader_console_init();
 
+	/* DDR initialization */
+#if defined (CONFIG_ADVANTECH)	
+	//spl_dram_init();
+#else
+	spl_dram_init();
+#endif
+
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);
 
@@ -1872,6 +1934,7 @@ void spi_io_init(struct imx_spi_dev_t *dev)
                 /* ecspi2-3 fall through */
                 break;
 #ifdef CONFIG_ADVANTECH
+#ifdef CONFIG_MX6Q
 #ifdef CONFIG_SPI_BOOT
         case ECSPI5_BASE_ADDR:
                 reg = readl(&ccm_regs->CCGR1);
@@ -1888,8 +1951,9 @@ void spi_io_init(struct imx_spi_dev_t *dev)
                 imx_iomux_v3_setup_pad(IOMUX_SPI5_CS2  | MUX_PAD_CTRL(NO_PAD_CTRL));
 #endif
                 break;
-#endif
-#endif
+#endif //CONFIG_SPI_BOOT
+#endif //CONFIG_MX6Q
+#endif //CONFIG_ADVANTECH
         default:
                 break;
         }

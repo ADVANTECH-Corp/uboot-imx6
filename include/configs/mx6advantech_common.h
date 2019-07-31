@@ -314,7 +314,11 @@
 /* Environment organization */
 #define CONFIG_ENV_SIZE			(8 * 1024)
 
+/* SATA CONFIG */
 #ifdef CONFIG_SATA
+#define CONFIG_CMD_SATA
+#endif
+#ifdef CONFIG_CMD_SATA
 #define CONFIG_DWC_AHSATA
 #define CONFIG_SYS_SATA_MAX_DEVICE	1
 #define CONFIG_DWC_AHSATA_PORT_ID	0
@@ -419,26 +423,20 @@
 #define CONFIG_POWER_PFUZE100_I2C_ADDR 0x08
 #endif
 
-/* Framebuffer */
-#define CONFIG_SPLASH_SCREEN
-#define CONFIG_SPLASH_SCREEN_ALIGN
-#define CONFIG_BMP_16BPP
-#define CONFIG_VIDEO_LOGO
-#define CONFIG_VIDEO_BMP_LOGO
-
-#if !defined(CONFIG_SPL_BUILD)
-#ifdef CONFIG_VIDEO
-#define CONFIG_VIDEO_IPUV3
-#define CONFIG_VIDEO_BMP_RLE8
-#define CONFIG_IMX_HDMI
-#define CONFIG_IMX_VIDEO_SKIP
-#endif
-#endif
-
 #if defined(CONFIG_ANDROID_SUPPORT)
 #include "mx6sabreandroid_common.h"
 #else
 #define CONFIG_USBD_HS
 
 #endif /* CONFIG_ANDROID_SUPPORT */
+
+
+
+/* boot device dev number */
+#define	CONFIG_EMMC_DEV_NUM	1
+#define	CONFIG_SD_DEV_NUM	0
+#define	CONFIG_SATA_DEV_NUM	0
+
+#define CONFIG_FASTBOOT_SATA_NO 8
+
 #endif                         /* __MX6QSABRE_COMMON_CONFIG_H */

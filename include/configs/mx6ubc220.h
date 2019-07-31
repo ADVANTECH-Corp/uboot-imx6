@@ -23,18 +23,22 @@
 #undef CONFIG_DEFAULT_FDT_FILE
 #endif
 
+#if defined(CONFIG_TARGET_MX6QUBC220A1_512M) || defined(CONFIG_TARGET_MX6DLUBC220A1_512M)
+#define PHYS_SDRAM_SIZE         (512u * 1024 * 1024)
+#elif defined(CONFIG_TARGET_MX6QUBC220A1_1G) || defined(CONFIG_TARGET_MX6DLUBC220A1_1G)
+#define PHYS_SDRAM_SIZE         (1u * 1024 * 1024 * 1024)
+#elif defined(CONFIG_TARGET_MX6QUBC220A1_2G) || defined(CONFIG_TARGET_MX6DLUBC220A1_2G)
+#define PHYS_SDRAM_SIZE         (2u * 1024 * 1024 * 1024)
+#endif
+
 #if defined(CONFIG_MX6QP)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6qp-ubc220-a1.dtb"
-#define PHYS_SDRAM_SIZE		(1u * 1024 * 1024 * 1024)
 #elif defined(CONFIG_MX6Q)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6q-ubc220-a1.dtb"
-#define PHYS_SDRAM_SIZE		(1u * 1024 * 1024 * 1024)
 #elif defined(CONFIG_MX6DL)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6dl-ubc220-a1.dtb"
-#define PHYS_SDRAM_SIZE		(1u * 1024 * 1024 * 1024)
-#elif defined(CONFIG_MX6SOLO)
+#elif defined(CONFIG_MX6S)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6dl-ubc220-a1.dtb"
-#define PHYS_SDRAM_SIZE		(512u * 1024 * 1024)
 #endif
 #define CONFIG_MMC_CLOCK_DOWNGRADE
 
@@ -68,6 +72,7 @@
 #define CONFIG_FEC_MXC_PHYADDR	7
 #undef CONFIG_PHY_ATHEROS
 #define CONFIG_PHY_REALTEK
+
 /*
  * imx6 q/dl/solo pcie would be failed to work properly in kernel, if
  * the pcie module is iniialized/enumerated both in uboot and linux
@@ -117,6 +122,17 @@
 #endif /* CONFIG_SPLASH_SCREEN && CONFIG_MXC_EPDC */
 #endif
 
+/* uncomment for SECURE mode support */
+/* #define CONFIG_SECURE_BOOT */
+
+#ifdef CONFIG_SECURE_BOOT
+#ifndef CONFIG_CSF_SIZE
+#define CONFIG_CSF_SIZE 0x4000
+#endif
+#endif
+
+/* #define CONFIG_MFG_IGNORE_CHECK_SECURE_BOOT */
+
 #define CONFIG_SUPPORT_LVDS
 #ifdef CONFIG_SUPPORT_LVDS
 #define IOMUX_LCD_BKLT_PWM 	MX6_PAD_SD1_CMD__GPIO1_IO18
@@ -134,5 +150,4 @@
 #define IOMUX_SPI_CS0           MX6_PAD_EIM_EB2__ECSPI1_SS0
 
 #define USDHC2_CD_GPIO		IMX_GPIO_NR(1, 4)
-#define USDHC3_CD_GPIO          IMX_GPIO_NR(2, 0)
 #endif                         /* __MX6SABRESD_CONFIG_H */

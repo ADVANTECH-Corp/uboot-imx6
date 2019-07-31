@@ -11,6 +11,9 @@
 #define __MX6SABRESD_CONFIG_H
 
 #ifdef CONFIG_SPL
+#define CONFIG_SATA
+#define CONFIG_SPL_LIBGENERIC_SUPPORT
+#define CONFIG_SPL_LIBDISK_SUPPORT
 #include "imx6_spl_advantech.h"
 #endif
 
@@ -19,25 +22,30 @@
 #define CONSOLE_DEV		"ttymxc0"
 #define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* SDHC3 */
 
+/* support SATA boot */
+#define CONFIG_SATA
+#define CONFIG_SATA_GEN2	0x05918732
+
 #if defined(CONFIG_DEFAULT_FDT_FILE)
 #undef CONFIG_DEFAULT_FDT_FILE
 #endif
 
-/* support SATA boot */
-/*#define CONFIG_SATA_BOOT
-#define CONFIG_SATA_GEN2	0x059195fe*/
+#if defined(CONFIG_TARGET_MX6QROM3420A1_512M)
+#define PHYS_SDRAM_SIZE         (512u * 1024 * 1024)
+#elif defined(CONFIG_TARGET_MX6QROM3420A1_1G)
+#define PHYS_SDRAM_SIZE         (1u * 1024 * 1024 * 1024)
+#elif defined(CONFIG_TARGET_MX6QROM3420A1_2G)
+#define PHYS_SDRAM_SIZE         (2u * 1024 * 1024 * 1024)
+#endif
+
 #if defined(CONFIG_MX6QP)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6qp-rom3420-a1.dtb"
-#define PHYS_SDRAM_SIZE		(1u * 1024 * 1024 * 1024)
 #elif defined(CONFIG_MX6Q)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6q-rom3420-a1.dtb"
-#define PHYS_SDRAM_SIZE		(1u * 1024 * 1024 * 1024)
 #elif defined(CONFIG_MX6DL)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6dl-rom3420-a1.dtb"
-#define PHYS_SDRAM_SIZE		(1u * 1024 * 1024 * 1024)
-#elif defined(CONFIG_MX6SOLO)
+#elif defined(CONFIG_MX6S)
 #define CONFIG_DEFAULT_FDT_FILE	"imx6dl-rom3420-a1.dtb"
-#define PHYS_SDRAM_SIZE		(512u * 1024 * 1024)
 #endif
 
 #include "mx6advantech_common.h"
@@ -137,6 +145,17 @@
 #endif /* CONFIG_SPLASH_SCREEN && CONFIG_MXC_EPDC */
 #endif
 
+/* uncomment for SECURE mode support */
+/* #define CONFIG_SECURE_BOOT */
+
+#ifdef CONFIG_SECURE_BOOT
+#ifndef CONFIG_CSF_SIZE
+#define CONFIG_CSF_SIZE 0x4000
+#endif
+#endif
+
+/* #define CONFIG_MFG_IGNORE_CHECK_SECURE_BOOT */
+
 #define CONFIG_SUPPORT_LVDS
 #ifdef CONFIG_SUPPORT_LVDS
 #define IOMUX_LCD_BKLT_PWM 	MX6_PAD_GPIO_9__GPIO1_IO09
@@ -156,6 +175,15 @@
 #define IOMUX_SPI_CS1           MX6_PAD_KEY_COL2__ENET_RX_DATA2
 
 #define USDHC2_CD_GPIO          IMX_GPIO_NR(2, 2)
-#define USDHC3_CD_GPIO          IMX_GPIO_NR(2, 0)
+
+#define CONFIG_PCIE_RESET
+#define IOMUX_PCIE_RESET        MX6_PAD_CSI0_PIXCLK__GPIO5_IO18    //PCIE_A_RST
+#define PCIE_RESET              IMX_GPIO_NR(5,18)
+
+
+#define CONFIG_RESET_OUT
+#ifdef CONFIG_RESET_OUT
+#define SABRESD_NANDF_D7	IMX_GPIO_NR(2, 7) /* GPIO2_7 */
+#endif
 
 #endif                         /* __MX6SABRESD_CONFIG_H */

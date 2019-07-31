@@ -55,12 +55,19 @@
 #endif
 
 /* SATA support */
-#ifdef CONFIG_SATA_BOOT
+#ifdef CONFIG_SATA
 #define CONFIG_SPL_SATA_SUPPORT
 #endif
-#if defined(CONFIG_SPL_SATA_SUPPORT)
-#define CONFIG_SPL_SATA_BOOT_DEVICE		0
-#define CONFIG_SYS_SATA_FAT_BOOT_PARTITION	1
+
+/* SPI support */
+#ifdef CONFIG_SPI_BOOT
+#ifdef CONFIG_MX6Q
+#define CONFIG_SPL_SPI_SUPPORT
+#define CONFIG_SPL_SPI_FLASH_SUPPORT
+#define CONFIG_SPL_SPI_LOAD
+#define CONFIG_SYS_SPI_U_BOOT_OFFS      (512*3)
+/* Need to define CONFIG_SPL_SPI_BUS & CONFIG_SPL_SPI_CS in project H file */
+#endif
 #endif
 
 #if defined(CONFIG_MX6SX)
