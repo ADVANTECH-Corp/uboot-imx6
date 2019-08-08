@@ -213,7 +213,6 @@
 	"image=Image\0" \
 	"panel=NULL\0" \
 	"console=ttyLP0\0" \
-	"earlycon=lpuart32,0x5a060000\0" \
 	"fdt_addr=0x83000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"cntr_addr=0x88000000\0"			\
@@ -233,7 +232,7 @@
 	"hdmi3840p24=setenv videores 3840x2160@24;boot\0" \
 	"hdmi3840=setenv videores 3840x2160@30;boot\0" \
 	"hdmi4096=setenv videores 4096x2160@30;boot\0" \
-	"mmcargs=setenv bootargs console=${console},${baudrate} earlycon=${earlycon},${baudrate} root=${mmcroot} video=HDMI-A-1:${videores} audit=0\0 " \
+	"mmcargs=setenv bootargs console=${console},${baudrate} root=${mmcroot} earlycon\0 " \
 	"lvds_ch0=setenv fdt_file imx8qm-rom7720-a1_ch0.dtb; boot\0" \
 	"lvds_ch1=setenv fdt_file imx8qm-rom7720-a1_ch1.dtb; boot\0" \
 	"lvds_dual=setenv fdt_file imx8qm-rom7720-a1_dual.dtb; boot\0" \
@@ -267,9 +266,9 @@
 				"echo wait for boot; " \
 			"fi;" \
 		"fi;\0" \
-	"netargs=setenv bootargs console=${console},${baudrate} earlycon=${earlycon},${baudrate} " \
+	"netargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp earlycon\0" \
 	"netboot=echo Booting from net ...; " \
 		"run netargs;  " \
 		"if test ${ip_dyn} = yes; then " \
