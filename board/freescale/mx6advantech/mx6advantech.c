@@ -1621,7 +1621,7 @@ int board_late_init(void)
 
 #ifdef CONFIG_SWITCH_DEBUG_PORT_TO_UART1
 	if (uart1_funtion == 0)
-		setenv("console", "NULL");
+		env_set("console", "NULL");
 #endif
 
 	return 0;
