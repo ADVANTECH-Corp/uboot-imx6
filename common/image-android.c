@@ -18,7 +18,6 @@
 #include <fsl_fastboot.h>
 #include <asm/setup.h>
 #include <dm.h>
-#include <mmc.h>
 
 #define ANDROID_IMAGE_DEFAULT_KERNEL_ADDR	0x10008000
 
@@ -126,7 +125,7 @@ int android_image_get_kernel(const struct andr_img_hdr *hdr, int verify,
 #endif
 	sprintf(newbootargs,
 #ifdef CONFIG_ANDROID_SUPPORT
-					"%s androidboot.serialno=%08x%08x",
+					" %s androidboot.serialno=%08x%08x",
 					adv_cmd_line,
 #else
                     " androidboot.serialno=%08x%08x",
