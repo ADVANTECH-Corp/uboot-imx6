@@ -159,6 +159,16 @@ static iomux_v3_cfg_t const reset_bdr1_pads[] = {
         MX7D_PAD_EPDC_BDR1__GPIO2_IO29  | MUX_PAD_CTRL(NO_PAD_CTRL),
 };
 
+static iomux_v3_cfg_t const usb1cpu_en_pads[] = {
+        MX7D_PAD_EPDC_DATA04__GPIO2_IO4 | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+static iomux_v3_cfg_t const usb2cpu_en_pads[] = {
+        MX7D_PAD_EPDC_DATA07__GPIO2_IO7 | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+static iomux_v3_cfg_t const usb1hub_rst_pads[] = {
+        MX7D_PAD_SAI1_RX_SYNC__GPIO6_IO16 | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+
 #else
 #ifdef CONFIG_MXC_EPDC
 #define IOX_SDI IMX_GPIO_NR(1, 9)
@@ -988,6 +998,16 @@ int board_init(void)
 
         imx_iomux_v3_setup_multiple_pads(reset_bdr1_pads, ARRAY_SIZE(reset_bdr1_pads));
         gpio_direction_output(RESET_BDR1_GPIO, 1);
+
+        /*set USB1_CPU_EN USB2_CPU_EN USB1_HUB_RST  SET OUT HIGH  */
+        imx_iomux_v3_setup_multiple_pads(usb1cpu_en_pads, ARRAY_SIZE(usb1cpu_en_pads));
+        gpio_direction_output(IMX_GPIO_NR(2, 4), 1);
+
+        imx_iomux_v3_setup_multiple_pads(usb2cpu_en_pads, ARRAY_SIZE(usb2cpu_en_pads));
+        gpio_direction_output(IMX_GPIO_NR(2, 7), 1);
+
+        imx_iomux_v3_setup_multiple_pads(usb1hub_rst_pads, ARRAY_SIZE(usb1hub_rst_pads));
+        gpio_direction_output(IMX_GPIO_NR(6, 16), 1);
 
 	boot_select_init();
 #else
