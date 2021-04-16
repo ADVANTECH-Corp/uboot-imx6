@@ -345,10 +345,17 @@
 
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
 #define CONFIG_NR_DRAM_BANKS		8
+#if defined(CONFIG_TARGET_IMX8QXP_ROM5620A1_2G)
 #define PHYS_SDRAM_1			0x80000000
 #define PHYS_SDRAM_2			0x880000000
 #define PHYS_SDRAM_1_SIZE		0x80000000	/* 2 GB */
 #define PHYS_SDRAM_2_SIZE		0x0
+#else
+#define PHYS_SDRAM_1                    0x80000000
+#define PHYS_SDRAM_2                    0x880000000
+#define PHYS_SDRAM_1_SIZE               0x80000000      /* 2 GB */
+#define PHYS_SDRAM_2_SIZE               0x80000000      /* 2 GB */
+#endif
 
 #define CONFIG_SYS_MEMTEST_START    0xA0000000
 #define CONFIG_SYS_MEMTEST_END      (CONFIG_SYS_MEMTEST_START + (PHYS_SDRAM_1_SIZE >> 2))
