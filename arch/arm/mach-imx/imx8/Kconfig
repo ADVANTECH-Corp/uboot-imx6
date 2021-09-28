@@ -47,11 +47,17 @@ choice
 	prompt "MX8 board select"
 	optional
 
-config TARGET_IMX8QM_ROM7720_A1
-	bool "Support i.MX8QM ROM-7720-A1 (4GB DRAM)"
+config TARGET_IMX8QM_ROM7720A1_2G
+	bool "Support i.MX8QM ROM-7720A1 2GB DRAM"
 	select BOARD_LATE_INIT
 	select SUPPORT_SPL
 	select IMX8QM
+
+config TARGET_IMX8QM_ROM7720A1_4G
+        bool "Support i.MX8QM ROM-7720A1 4GB DRAM"
+        select BOARD_LATE_INIT
+        select SUPPORT_SPL
+        select IMX8QM
 
 config TARGET_IMX8QM_LPDDR4_ARM2
 	bool "Support i.MX8QM lpddr4 validation board"

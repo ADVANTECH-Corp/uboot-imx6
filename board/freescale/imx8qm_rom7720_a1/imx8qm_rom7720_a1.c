@@ -219,8 +219,11 @@ static void board_gpio_init(void)
 
 int checkboard(void)
 {
+#if defined(CONFIG_TARGET_IMX8QM_ROM7720A1_2G)
+	puts("Board: ROM-7720-A1 2GB\n");
+#else
 	puts("Board: ROM-7720-A1 4GB\n");
-
+#endif
 	print_bootinfo();
 
 	/* Note:  After reloc, ipcHndl will no longer be valid.  If handle
