@@ -84,6 +84,12 @@ config TARGET_IMX8MQ_ROM5720A1_2G
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_IMX8MQ_ROM5720A1_4G
+        bool "imx8mq rom5720a1 4G"
+        select IMX8MQ
+        select SUPPORT_SPL
+        select IMX8M_LPDDR4
+
 endchoice
 
 config SYS_SOC

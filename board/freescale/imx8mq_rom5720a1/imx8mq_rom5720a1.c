@@ -118,6 +118,19 @@ int ft_board_setup(void *blob, bd_t *bd)
 }
 #endif
 
+#ifdef CONFIG_TARGET_IMX8MQ_ROM5720A1_4G
+/* Get the top of usable RAM */
+ulong board_get_usable_ram_top(ulong total_size)
+{
+	//printf("board_get_usable_ram_top total_size is 0x%lx \n", total_size);
+
+	if(gd->ram_top > 0x100000000)
+		gd->ram_top = 0x100000000;
+
+	return gd->ram_top;
+}
+#endif
+
 void setup_iomux_wdt()
 {
         imx_iomux_v3_setup_pad(IOMUX_WDOG_TRIG| MUX_PAD_CTRL(NO_PAD_CTRL));
