@@ -108,13 +108,46 @@ int dram_init(void)
 	else
 		gd->ram_size = PHYS_SDRAM_SIZE;
 
+#if CONFIG_NR_DRAM_BANKS > 1
+        gd->ram_size += PHYS_SDRAM_2_SIZE;
+#endif
+
 	return 0;
+}
+
+int dram_init_banksize(void)
+{
+        gd->bd->bi_dram[0].start = PHYS_SDRAM;
+        if (rom_pointer[1])
+                gd->bd->bi_dram[0].size = PHYS_SDRAM_SIZE -rom_pointer[1];
+        else
+                gd->bd->bi_dram[0].size = PHYS_SDRAM_SIZE;
+
+#if CONFIG_NR_DRAM_BANKS > 1
+        gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
+        gd->bd->bi_dram[1].size = PHYS_SDRAM_2_SIZE;
+#endif
+
+        return 0;
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	return 0;
+}
+#endif
+
+#ifdef CONFIG_TARGET_IMX8MQ_ROM5720A1_4G
+/* Get the top of usable RAM */
+ulong board_get_usable_ram_top(ulong total_size)
+{
+	//printf("board_get_usable_ram_top total_size is 0x%lx \n", total_size);
+
+	if(gd->ram_top > 0x100000000)
+		gd->ram_top = 0x100000000;
+
+	return gd->ram_top;
 }
 #endif
 
@@ -159,12 +192,22 @@ static int setup_fec(void)
 
 int board_phy_config(struct phy_device *phydev)
 {
-	/* enable rgmii rxc skew and phy mode select to RGMII copper */
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x1d, 0x1f);
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0x8);
+	unsigned short val;
 
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x1d, 0x05);
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0x100);
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0d04);
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x10, 0xa050);
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x11, 0x0000);
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0000);
+
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0d08);
+        val = phy_read(phydev, MDIO_DEVAD_NONE, 0x11);
+        val |= (0x1 << 8);//enable TX delay
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x11, val);
+
+        val = phy_read(phydev, MDIO_DEVAD_NONE, 0x15);
+        val |= (0x1 << 3);//enable RX delay
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x15, val);
+        phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x0000);
 
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
@@ -434,3 +477,11 @@ int get_imx8m_baseboard_id(void)
 	return IMX8M_REF_3G;
 }
 #endif
+
+phys_size_t get_effective_memsize(void)
+{
+        if (rom_pointer[1])
+                return (PHYS_SDRAM_SIZE - rom_pointer[1]);
+        else
+                return PHYS_SDRAM_SIZE;
+}
