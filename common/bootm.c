@@ -781,6 +781,7 @@ static const void *boot_get_kernel(cmd_tbl_t *cmdtp, int flag, int argc,
 				   char * const argv[], bootm_headers_t *images,
 				   ulong *os_data, ulong *os_len)
 {
+printf( "boot_getkernel start\n" ) ;
 #if defined(CONFIG_IMAGE_FORMAT_LEGACY)
 	image_header_t	*hdr;
 #endif
@@ -804,6 +805,7 @@ static const void *boot_get_kernel(cmd_tbl_t *cmdtp, int flag, int argc,
 	/* check image type, for FIT images get FIT kernel node */
 	*os_data = *os_len = 0;
 	buf = map_sysmem(img_addr, 0);
+	printf( "boot_getkenerl_middle\n" ) ;
 	switch (genimg_get_format(buf)) {
 #if defined(CONFIG_IMAGE_FORMAT_LEGACY)
 	case IMAGE_FORMAT_LEGACY:

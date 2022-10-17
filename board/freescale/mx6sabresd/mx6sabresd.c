@@ -83,10 +83,25 @@ int dram_init(void)
 	gd->ram_size = imx_ddr_size();
 	return 0;
 }
+/* mx6sabresd origin
 
 static iomux_v3_cfg_t const uart1_pads[] = {
 	MX6_PAD_CSI0_DAT10__UART1_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 	MX6_PAD_CSI0_DAT11__UART1_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
+};
+
+*/
+
+static iomux_v3_cfg_t const uart3_pads[] = {
+	MX6_PAD_EIM_D31__UART3_RTS_B | MUX_PAD_CTRL(UART_PAD_CTRL),
+	MX6_PAD_EIM_D23__UART3_CTS_B | MUX_PAD_CTRL(UART_PAD_CTRL),
+	MX6_PAD_EIM_D24__UART3_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
+	MX6_PAD_EIM_D25__UART3_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
+};
+
+static iomux_v3_cfg_t const uart4_pads[] = {
+	MX6_PAD_KEY_COL0__UART4_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
+	MX6_PAD_KEY_ROW0__UART4_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
 static iomux_v3_cfg_t const enet_pads[] = {
@@ -250,7 +265,9 @@ iomux_v3_cfg_t const di0_pads[] = {
 
 static void setup_iomux_uart(void)
 {
-	imx_iomux_v3_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads));
+/*	imx_iomux_v3_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads)); */
+	imx_iomux_v3_setup_multiple_pads(uart3_pads, ARRAY_SIZE(uart3_pads));
+	imx_iomux_v3_setup_multiple_pads(uart4_pads, ARRAY_SIZE(uart4_pads));
 }
 
 #if defined(CONFIG_MX6DL) && defined(CONFIG_MXC_EPDC)
@@ -308,7 +325,12 @@ struct fsl_esdhc_cfg usdhc_cfg[3] = {
 	{USDHC4_BASE_ADDR},
 };
 
+/* mx6sabresd origin
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(2, 2)
+#define USDHC3_CD_GPIO	IMX_GPIO_NR(2, 0)
+*/
+
+#define USDHC2_CD_GPIO	IMX_GPIO_NR(1, 4)
 #define USDHC3_CD_GPIO	IMX_GPIO_NR(2, 0)
 
 int board_mmc_get_env_dev(int devno)

@@ -310,24 +310,34 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
 	debug("## Transferring control to Linux (at address %08lx)" \
 		"...\n", (ulong) kernel_entry);
 	bootstage_mark(BOOTSTAGE_ID_RUN_OS);
+
+	printf( "ready to announce and clean up\n" ) ;
 	announce_and_cleanup(fake);
+
+	printf( "announce and clean up end\n"  ) ;
 
 	if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len)
 		r2 = (unsigned long)images->ft_addr;
 	else
 		r2 = gd->bd->bi_boot_params;
 
+	printf("if fake start\n");
 	if (!fake) {
 #ifdef CONFIG_ARMV7_NONSEC
+		printf( "in fake\n" ) ;
 		if (armv7_boot_nonsec()) {
+			printf( "armv7_boot_nonsec()\n" ) ;
 			armv7_init_nonsec();
 			secure_ram_addr(_do_nonsec_entry)(kernel_entry,
 							  0, machid, r2);
 		} else
 #endif
+			printf( "call kernel entry()\n"  );
 			kernel_entry(0, machid, r2);
+			printf( "call kernel entry() end\n" );
 	}
 #endif
+printf( "boot_jump_linux() return\n"  ) ;
 }
 
 /* Main Entry point for arm bootm implementation
@@ -338,7 +348,8 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
  */
 int do_bootm_linux(int flag, int argc, char * const argv[],
 		   bootm_headers_t *images)
-{
+{	
+	printf( "do_bootm_linux()\n"  ) ;
 	/* No need for those on ARM */
 	if (flag & BOOTM_STATE_OS_BD_T || flag & BOOTM_STATE_OS_CMDLINE)
 		return -1;
@@ -349,12 +360,18 @@ int do_bootm_linux(int flag, int argc, char * const argv[],
 	}
 
 	if (flag & (BOOTM_STATE_OS_GO | BOOTM_STATE_OS_FAKE_GO)) {
+		printf( "call do_jump_linux()\n" ) ;
 		boot_jump_linux(images, flag);
+		printf( "call do_jump_linux() end\n" ) ;
 		return 0;
 	}
 
+	printf( "boot prep linux start\n"  );
+
 	boot_prep_linux(images);
 	boot_jump_linux(images, flag);
+
+	printf( "boot prep linux end\n" );
 	return 0;
 }
 
@@ -371,6 +388,7 @@ struct zimage_header {
 
 int bootz_setup(ulong image, ulong *start, ulong *end)
 {
+	printf( "call bootz_setup()\n" ) ;
 	struct zimage_header *zi;
 
 	zi = (struct zimage_header *)map_sysmem(image, 0);
@@ -385,6 +403,7 @@ int bootz_setup(ulong image, ulong *start, ulong *end)
 	printf("Kernel image @ %#08lx [ %#08lx - %#08lx ]\n", image, *start,
 	      *end);
 
+	printf( "call bootz_setup() end\n" ) ;
 	return 0;
 }
 

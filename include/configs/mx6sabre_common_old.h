@@ -137,7 +137,7 @@
 	"epdc_waveform=epdc_splash.bin\0" \
 	"script=boot.scr\0" \
 	"image=zImage\0" \
-	"fdt_file=imx6qp-sabresd-ldo.dtb\0" \
+	"fdt_file=undefined\0" \
 	"fdt_addr=0x18000000\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
@@ -173,11 +173,9 @@
 		"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"showimage=echo <u-boot> loading image from mmc:${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
-	"loadimage=run showimage; fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image};\0" \
-	"showfdt=echo <u-boot> loading fdt from mmc:${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
-	"loadfdt=run showfdt; fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file};\0" \
-	"mmcboot=echo Booting from mmc:${mmcdev}:${mmcpart} ...; " \
+	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
+	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
@@ -216,8 +214,27 @@
 		"else " \
 			"bootz; " \
 		"fi;\0" \
+		"findfdt="\
+			"if test $fdt_file = undefined; then " \
+				"if test $board_name = SABREAUTO && test $board_rev = MX6QP; then " \
+					"setenv fdt_file imx6qp-sabreauto.dtb; fi; " \
+				"if test $board_name = SABREAUTO && test $board_rev = MX6Q; then " \
+					"setenv fdt_file imx6q-sabreauto.dtb; fi; " \
+				"if test $board_name = SABREAUTO && test $board_rev = MX6DL; then " \
+					"setenv fdt_file imx6dl-sabreauto.dtb; fi; " \
+				"if test $board_name = SABRESD && test $board_rev = MX6QP; then " \
+					"setenv fdt_file imx6qp-sabresd.dtb; fi; " \
+				"if test $board_name = SABRESD && test $board_rev = MX6Q; then " \
+					"setenv fdt_file imx6q-sabresd.dtb; fi; " \
+				"if test $board_name = SABRESD && test $board_rev = MX6DL; then " \
+					"setenv fdt_file imx6dl-sabresd.dtb; fi; " \
+				"if test $fdt_file = undefined; then " \
+					"echo WARNING: Could not determine dtb to use; fi; " \
+			"fi;\0" \
+
 
 #define CONFIG_BOOTCOMMAND \
+	"run findfdt;" \
 	"mmc dev ${mmcdev};" \
 	"if mmc rescan; then " \
 		"if run loadbootscript; then " \
