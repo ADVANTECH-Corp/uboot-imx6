@@ -175,11 +175,11 @@ int power_init_board(void)
 		reg |= 0x18;
 		pmic_reg_write(p, PFUZE100_SW3AVOL, reg);
 	}
-// Due to GPU issue, we set gpu volt from 0.9v to 1.0v
+// Due to GPU issue, we set gpu volt from 0.9v to 1.1v
 	pmic_reg_read(p, PFUZE100_SW1ABVOL, &reg);
 	if ((reg & 0x3f) != 0x1c) {
 		reg &= ~0x3f;
-		reg |= 0x1c;
+		reg |= 0x20;
 		pmic_reg_write(p, PFUZE100_SW1ABVOL, reg);
 	}
 
